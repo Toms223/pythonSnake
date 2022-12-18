@@ -1,9 +1,88 @@
+import time
+
 from linked_list import LinkedList
+from wall import Wall
+import ion
+from snake import Game
+from apple import Apple
+import draw
+from kandinsky import display
 
-c = LinkedList(None, 12)
-b = LinkedList(c, 11)
-a = LinkedList(b, 10)
+fps = (1.0 / 3.0)
 
-a.move(9)
 
-print(a.pos, b.pos, c.pos)
+def get_direction(direction):
+    if ion.keydown(ion.KEY_DOWN) and direction != "up":
+        return "down"
+    elif ion.keydown(ion.KEY_LEFT) and direction != "right":
+        return "left"
+    elif ion.keydown(ion.KEY_UP) and direction != "down":
+        return "up"
+    elif ion.keydown(ion.KEY_RIGHT) and direction != "left":
+        return "right"
+    else:
+        return None
+
+
+SCREEN_WIDTH = 320
+SCREEN_HEIGHT = 220
+
+y = 0
+walls = []
+x = 10
+while y < SCREEN_HEIGHT:
+    walls.append(Wall(0, y))
+    walls.append(Wall(SCREEN_WIDTH - 10, y))
+    y += 10
+
+walls.pop(-2)
+
+while x < SCREEN_WIDTH:
+    walls.append(Wall(x, 0))
+    walls.append(Wall(x, SCREEN_HEIGHT - 8))
+    x += 10
+
+game = Game(LinkedList(None, (int(SCREEN_WIDTH / 2), int((SCREEN_HEIGHT / 2)))), 0, Apple(30, 30), walls)
+direction = "down"
+draw.draw_walls(walls)
+
+if __name__ == "__main__":
+    while True:
+        start = time.time()
+        while time.time() - start < fps:
+            change = get_direction(direction)
+            if change is not None:
+                direction = change
+                end = time.time()
+                break
+            end = time.time()
+        time.sleep(fps + 0.1 - (end - start))
+        if direction == "down":
+            game.move(game.snake.pos[0], game.snake.pos[1] + 10)
+        if direction == "up":
+            game.move(game.snake.pos[0], game.snake.pos[1] - 10)
+        if direction == "left":
+            game.move(game.snake.pos[0] - 10, game.snake.pos[1])
+        if direction == "right":
+            game.move(game.snake.pos[0] + 10, game.snake.pos[1])
+
+        if game.over:
+            break
+
+        if game.snake.pos == (game.apple.x, game.apple.y):
+            game.apple.new_pos()
+            game.add_score()
+            if direction == "down":
+                game.add_to_snake(LinkedList(None, (game.snake.pos[0], game.snake.pos[1] - 10)))
+            if direction == "up":
+                game.add_to_snake(LinkedList(None, (game.snake.pos[0], game.snake.pos[1] + 10)))
+            if direction == "left":
+                game.add_to_snake(LinkedList(None, (game.snake.pos[0] + 10, game.snake.pos[1])))
+            if direction == "right":
+                game.add_to_snake(LinkedList(None, (game.snake.pos[0] - 10, game.snake.pos[1])))
+
+        display(True)
+        draw.clear()
+        draw.draw_snake(game.snake)
+        draw.draw_apple(game.apple)
+        draw.draw_string(str(game.score), 0, SCREEN_HEIGHT - 15)

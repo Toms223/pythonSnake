@@ -1,3 +1,5 @@
+
+
 class LinkedList:
     def __init__(self, following, pos):
         self.following = following
