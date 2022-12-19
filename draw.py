@@ -9,10 +9,8 @@ def clear():
 
 
 def draw_snake(snake):
-    temp = snake
-    while temp is not None:
-        fill_rect(temp.pos[0], temp.pos[1], 10, 10, (255, 255, 0))
-        temp = temp.following
+    for part in snake:
+        fill_rect(part[0], part[1], 10, 10, (255, 255, 0))
 
 
 def draw_apple(apple):

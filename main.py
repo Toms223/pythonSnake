@@ -1,6 +1,4 @@
 import time
-
-from linked_list import LinkedList
 from wall import Wall
 import ion
 from snake import Game
@@ -42,10 +40,11 @@ while x < SCREEN_WIDTH:
     walls.append(Wall(x, SCREEN_HEIGHT - 8))
     x += 10
 
-game = Game(LinkedList(None, (int(SCREEN_WIDTH / 2), int((SCREEN_HEIGHT / 2)))), 0, Apple(30, 30), walls)
+game = Game([[int(SCREEN_WIDTH/2), int(SCREEN_HEIGHT/2)]], 0, Apple(30, 30), walls)
 direction = "down"
 draw.draw_walls(walls)
-
+draw.draw_string(str(game.score), 0, SCREEN_HEIGHT - 15)
+draw.draw_apple(game.apple)
 if __name__ == "__main__":
     while True:
         start = time.time()
@@ -54,35 +53,38 @@ if __name__ == "__main__":
             if change is not None:
                 direction = change
                 end = time.time()
+                time.sleep(fps + 0.1 - (end - start))
                 break
             end = time.time()
-        time.sleep(fps + 0.1 - (end - start))
+
         if direction == "down":
-            game.move(game.snake.pos[0], game.snake.pos[1] + 10)
+            game.move(0, 10)
         if direction == "up":
-            game.move(game.snake.pos[0], game.snake.pos[1] - 10)
+            game.move(0, -10)
         if direction == "left":
-            game.move(game.snake.pos[0] - 10, game.snake.pos[1])
+            game.move(-10, 0)
         if direction == "right":
-            game.move(game.snake.pos[0] + 10, game.snake.pos[1])
+            game.move(10, 0)
 
         if game.over:
             break
 
-        if game.snake.pos == (game.apple.x, game.apple.y):
+        if game.snake[0] == [game.apple.x, game.apple.y]:
             game.apple.new_pos()
             game.add_score()
+
             if direction == "down":
-                game.add_to_snake(LinkedList(None, (game.snake.pos[0], game.snake.pos[1] - 10)))
+                game.add_to_snake([game.snake[len(game.snake)-1][0], game.snake[len(game.snake)-1][1] - 10])
             if direction == "up":
-                game.add_to_snake(LinkedList(None, (game.snake.pos[0], game.snake.pos[1] + 10)))
+                game.add_to_snake([game.snake[len(game.snake)-1][0], game.snake[len(game.snake)-1][1] + 10])
             if direction == "left":
-                game.add_to_snake(LinkedList(None, (game.snake.pos[0] + 10, game.snake.pos[1])))
+                game.add_to_snake([game.snake[len(game.snake)-1][0] + 10, game.snake[len(game.snake)-1][1]])
             if direction == "right":
-                game.add_to_snake(LinkedList(None, (game.snake.pos[0] - 10, game.snake.pos[1])))
+                game.add_to_snake([game.snake[len(game.snake)-1][0] - 10, game.snake[len(game.snake)-1][1]])
 
         display(True)
         draw.clear()
-        draw.draw_snake(game.snake)
         draw.draw_apple(game.apple)
         draw.draw_string(str(game.score), 0, SCREEN_HEIGHT - 15)
+        draw.draw_snake(game.snake)
+
