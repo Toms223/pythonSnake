@@ -46,6 +46,8 @@ draw.draw_walls(walls)
 draw.draw_string(str(game.score), 0, SCREEN_HEIGHT - 15)
 draw.draw_apple(game.apple)
 if __name__ == "__main__":
+    while not ion.keydown(ion.KEY_PLUS):
+        draw.draw_main_menu()
     while True:
         start = time.time()
         while time.time() - start < fps:
@@ -87,4 +89,5 @@ if __name__ == "__main__":
         draw.draw_apple(game.apple)
         draw.draw_string(str(game.score), 0, SCREEN_HEIGHT - 15)
         draw.draw_snake(game.snake)
-
+    draw.draw_game_over(game.score)
+    time.sleep(2.5)
